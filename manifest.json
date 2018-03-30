@@ -14,5 +14,27 @@
   },
   "permissions": [
     "activeTab"
+  ],
+  "commands": {
+    "skip-up": {
+      "suggested_key": { 
+        "default": "Alt+Shift+Up" 
+      },
+      "description": "Skip to previous update"
+    },
+    "skip-down": {
+      "suggested_key": { 
+        "default": "Alt+Shift+Down" 
+      },
+      "description": "Skip to next update"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://stackoverflow.com/*"],
+      "css": ["styles.css"],
+      "js": ["scripts/stackoverflow.js"],
+      "run_at": "document_end"
+    }
   ]
 }
