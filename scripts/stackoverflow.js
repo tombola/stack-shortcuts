@@ -8,30 +8,34 @@ function jump(h){
 };
 
 function getPostList() {
-  var posts = [];
-  anchors = document.querySelectorAll('a[name]')
-  anchors.forEach(function(el){
-    let post = {};
-    // console.log(el.offsetTop);
-    post = {
-      'offsetTop': el.offsetTop 
-    };
-    posts.push(post);
-  });
-  // console.log(posts);
-  return posts;
+  var anchors;
+  // anchors = document.querySelectorAll('a[name]')
+  // Return true array rather than NodeList
+  anchors = [].slice.call(document.querySelectorAll('a[name]'));
+  return anchors;
 }
 
 function getCurrentPost() {
-  // getPostList();
+  let offset = 100;
+  let posts = getPostList();
+  let laterPosts = posts.filter(post => post.offsetTop > (window.pageYOffset+offset));
+  return laterPosts[0];
 }
 
 function getNextPost() {
-  // getCurrentPost();
+  let posts = getPostList();
+  let laterPosts = posts.filter(post => post.offsetTop - 100 > window.pageYOffset);
+  console.log(laterPosts[laterPosts.length-1]);
+  return laterPosts[0];
 }
 
 function getPrevPost() {
-  // getCurrentPost();
+  let posts = getPostList();
+  let earlierPosts = posts.filter(post => post.offsetTop + 100 < window.pageYOffset);
+  console.log(earlierPosts[earlierPosts.length-1]);
+  // debugger;
+
+  return earlierPosts[earlierPosts.length-1];
 }
 
 
@@ -40,15 +44,14 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 
   console.log(msg.action);
   posts = getPostList();
-  console.log(posts);
-
+  // console.log(posts);
   
   switch (msg.action) {
     case 'skip-up':
-        jump('15195401');
+        jump(getPrevPost().name);
         break;
     case 'skip-down':
-        jump('15195401');
+        jump(getNextPost().name);
         break;        
   }
 });
