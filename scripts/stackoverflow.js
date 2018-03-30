@@ -1,4 +1,4 @@
-console.log('I have a content script');
+// console.log('I have a content script');
 
 function jump(h){
     console.log('jump');
@@ -9,7 +9,6 @@ function jump(h){
 
 function getPostList() {
   var anchors;
-  // anchors = document.querySelectorAll('a[name]')
   // Return true array rather than NodeList
   anchors = [].slice.call(document.querySelectorAll('a[name]'));
   return anchors;
@@ -26,7 +25,10 @@ function getNextPost() {
   let posts = getPostList();
   let laterPosts = posts.filter(post => post.offsetTop - 100 > window.pageYOffset);
   console.log(laterPosts[laterPosts.length-1]);
-  return laterPosts[0];
+  if (laterPosts.count) {
+    return laterPosts[0];
+  } 
+  return false;
 }
 
 function getPrevPost() {
@@ -34,10 +36,11 @@ function getPrevPost() {
   let earlierPosts = posts.filter(post => post.offsetTop + 100 < window.pageYOffset);
   console.log(earlierPosts[earlierPosts.length-1]);
   // debugger;
-
-  return earlierPosts[earlierPosts.length-1];
+  if (earlierPosts) {
+    return earlierPosts[earlierPosts.length-1];
+  }
+  return false;
 }
-
 
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   var posts = [];
@@ -48,10 +51,19 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   
   switch (msg.action) {
     case 'skip-up':
-        jump(getPrevPost().name);
+        if (getPrevPost()) {
+          jump(getPrevPost().name);
+          break;
+        }
+        window.scrollTo(0,0);
         break;
     case 'skip-down':
-        jump(getNextPost().name);
+        if (getNextPost()) {
+          jump(getNextPost().name);
+          break;
+        }
+        jump('new-answer');
+        document.getElementById('post-editor').querySelector('textarea').focus();
         break;        
   }
 });
